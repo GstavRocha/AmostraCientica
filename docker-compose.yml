@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app-web:
+    build: 
+      context: ./WEB
+      dockerfile: ./ContainerSite/Dockerfile  
+    container_name: WEB-APP
+    ports:
+      - "8080:8080"
+    volumes:
+      - app-web:/usr/src/app
+    command: yarn services
+    networks:
+      - amostra-network
+  
+  database:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    restart: always
+    container_name: DATABASE-MYSQL
+    environment:
+      MYSQL_ROOT_PASSWORD: danidani
+      MYSQL_DATABASE: dbAmostra
+      MYSQL_USER: myUser
+      MYSQL_PASSWORD: myPass
+    volumes:
+      - data_base:/var/lib/mysql 
+    networks:
+      - amostra-network
+  
+  api-app:
+    build:
+      context: ./API
+      dockerfile: ./ContainerApi/Dockerfile 
+    depends_on:
+      - database
+    container_name: API-APP
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - api-web:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run dev
+    networks:
+      - amostra-network
+
+volumes:
+  app-web:
+  data_base:
+  api-web:
+
+networks:
+  amostra-network:
+    driver: bridge
