@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app-web:
     build: 
-      context: ./WEB
+      context: ./WEB ## onde ele encontra os arquivos a serem copiados
       dockerfile: ./ContainerSite/Dockerfile  
     container_name: WEB-APP
     ports:
@@ -32,7 +32,7 @@ services:
   
   api-app:
     build:
-      context: ./API
+      context: ./API ## onde ele encontra os arquivos a serem copiados
       dockerfile: ./ContainerApi/Dockerfile 
     depends_on:
       - database
