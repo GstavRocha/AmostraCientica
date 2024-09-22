@@ -1,0 +1,1 @@
+verificar component de qr componente filho
