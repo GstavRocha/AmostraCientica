@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex align-center" style="height: 30vh;">
+    <div class="d-flex align-center" style="height: 10vh;">
       <v-overlay v-model="overlayVisible" 
       style="background-color: rgba(255, 255, blue, 7.1);" 
       activator="parent" location-strategy="connected" 
@@ -34,7 +34,7 @@
     mounted() {
       setTimeout(() => {
         this.showText = false;
-      }, 10000);
+      }, 1000);
     },
   });
   </script>
@@ -44,7 +44,7 @@
     transition: opacity 2ms ease;
   }
   .fade-enter, .fade-leave-to {
-    opacity: 10.0;
+    opacity: 100.0;
   }
   </style>
   
