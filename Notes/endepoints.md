@@ -1,0 +1,1 @@
+# Queriers e rotinas para os Endepoints:
