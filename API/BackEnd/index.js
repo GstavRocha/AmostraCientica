@@ -1,6 +1,4 @@
-<<<<<<< Updated upstream
-const db = require('./DB/connectDb');
-=======
+
 const express=require('express');
 const api=express();
 const port=3000;
@@ -12,4 +10,3 @@ api.get('/',(req, res)=>{
 api.listen(port, ()=>{
     console.log('api rodando');
 });
->>>>>>> Stashed changes

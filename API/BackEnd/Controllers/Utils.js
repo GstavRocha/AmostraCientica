@@ -1,22 +1,36 @@
-const database = require('../DB/connectDb');
+const db = require('../DB/connectDb');
 
-const teste = 'SHOW DATABASES';
-const util = (sql) =>{
-    return new Promise((resolve, reject)=>{
-        database.query(sql, (err, result, fields)=>{
-            err? console.error('Util error -->', err):((JSON.stringify(result))=>{resolve()});
-        });
-    });
+let resultado = {
+    'result': null,
+    'campo': null
 }
-// const util = (sql) =>{
-//     return new Promise((resolve, reject)=>{
-//         database.query(sql, (err, result, fields)=>{
-//             if(err){
-//                 console.error(err);
-//                 reject(err);
-//             }
-//             const jsonResult = JSON.stringify(result);
-//             resolve(jsonResult);
-//         });
-//     });
-// }
+module.exports = util = (sql) =>{
+    try{
+        db.query(sql, (err, result, fields) =>{
+            if(err){ return callback(err, null)}
+            resultado.result = JSON.stringify(result);
+            resultado. campo = JSON.stringify(fields);
+            console.log(resultado, '--> dentro de Util')
+            return resultado;
+           })
+    }catch(error){
+        console.error(error);
+    }
+}
+module.exports = utilHeader = (param) =>{
+    result = param;
+    campo = param;
+    return new Promise ((resolve, reject)=>{
+        try{
+            const headers ={
+                'Content-type':'text/html',
+                'x-custom-Header': `${result}`
+            }
+            // console.log('ok UtilHeader--->',headers)
+            resolve(headers)
+        }catch(err){
+            console.error('UtilHeader--->',err);
+            reject(err)
+        }
+    })
+}
