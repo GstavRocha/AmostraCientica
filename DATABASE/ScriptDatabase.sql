@@ -90,3 +90,31 @@ create database wordpress;
 SHOW DATABASES;
 
 
+DELIMITER //
+
+CREATE PROCEDURE spAlunos(
+    IN spNome VARCHAR(255),
+    IN spturno ENUM('td', 'mn'),
+    IN spdianasc INT,
+    IN spmesnasc INT,
+    IN spanonasci INT
+)
+BEGIN
+    DECLARE checkUser VARCHAR(255);
+    SELECT al.nomeAluno INTO checkUser
+    FROM tbAlunos al
+    WHERE al.nomeAluno LIKE CONCAT('%', spNome, '%')
+      AND al.turno = spturno;
+
+    IF checkUser IS NULL THEN
+        INSERT INTO tbAlunos(nomeAluno, turno, diaNascimento, mesNascimento, anoNascimento)
+        VALUES (spNome, spturno, spdianasc, spmesnasc, spanonasci);
+
+        SELECT "Aluno cadastrado" AS resultado;
+    ELSE
+        SELECT "Não é possível cadastrar esse aluno, já existe" AS resultado;
+    END IF;
+
+END //
+
+DELIMITER ;

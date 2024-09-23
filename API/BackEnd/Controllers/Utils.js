@@ -1,18 +1,22 @@
 const database = require('../DB/connectDb');
 
+const teste = 'SHOW DATABASES';
 const util = (sql) =>{
     return new Promise((resolve, reject)=>{
-        try{
-            database.query(sql, (err, result, fields)=>{
-                console.log(fields);
-                return err? (console.error(err),reject(err)): resolve(JSON.stringify(result));
-            });
-        }
-        catch(error){
-            console.error('Util erro -->', error)
-            reject(error);
-        }
+        database.query(sql, (err, result, fields)=>{
+            err? console.error('Util error -->', err):((JSON.stringify(result))=>{resolve()});
+        });
     });
 }
-module.exports = util;
-// PAREI AQUI
+// const util = (sql) =>{
+//     return new Promise((resolve, reject)=>{
+//         database.query(sql, (err, result, fields)=>{
+//             if(err){
+//                 console.error(err);
+//                 reject(err);
+//             }
+//             const jsonResult = JSON.stringify(result);
+//             resolve(jsonResult);
+//         });
+//     });
+// }
