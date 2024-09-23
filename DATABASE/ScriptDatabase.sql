@@ -117,4 +117,16 @@ BEGIN
 
 END //
 
+DELIMITER //
+create procedure spInserirAluno(in spNomeAluno varchar(60),in spTurma varchar(60),in spResponsavel varchar(60),in spNumero varchar(60))
+BEGIN
+    DECLARE chkUser varchar(60);
+    SELECT al.nomeAluno into  chkUser from tbAlunos al where nomeAluno like  concat('%',spNomeAluno,'%');
+    IF chkUser is not null then
+        insert into tbAlunos(nomeAluno,Turma, Responsavel, NumeroResponsavel) values (spNomeAluno, spTurma, spResponsavel, spNumero);
+        SELECT "USUARIO CRIADO" as RESULTADO;
+    ELSE
+        SELECT "USUARIO JA EXISTE" AS RESULTADO;
+    end if ;
+end //
 DELIMITER ;
