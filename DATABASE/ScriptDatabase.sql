@@ -1,124 +1,205 @@
--- Database script: It is a script that creates the database and your tables. It isn't duppimg dabase.
-# create database bdAmostra; // ja fiz
-use dbAmostra;
-create table tbAlunos(
-    idAlunos int not null auto_increment primary key,
-    nomeAluno varchar(60) not null,
-    turno enum('td','mn') not null comment 'td: tarde, mn: manhã',
-    diaNascimento int not null,
-    mesNascimento int not null,
-    anoNascimento int not null
-);
-create table tbPontuacoes(
-    idPontuacao int not null auto_increment primary key,
-    idAluno  int not null,
-    idPalestra int not null,
-    descricao varchar(100) not null,
-    pontos int not null DEFAULT 0
+create table tbAlunos
+(
+    idAlunos          int auto_increment
+        primary key,
+    nomeAluno         varchar(60) not null,
+    Responsavel       varchar(60) not null comment 'responśavel financeiro cadastrado',
+    NumeroResponsavel varchar(60) not null,
+    Turma             varchar(60) not null
 );
 
-create table tbPalestras(
-    idPalestra int auto_increment not null primary key ,
-    titulo varchar(50) not null,
-    descricao varchar(100) not null,
-    diaPalestras int not null,
-    mesPalestras int not null,
-    anoPalestras int not null
-);
-create table tbTrabalhos(
-    idTrabalhos int auto_increment primary key not null,
-    tituloTrabalho  varchar(30) not null,
-    descricao text not null
-);
-create table tbProfessores(
-    idProfessores int auto_increment primary key not null,
-    nomeProfessor varchar(50) not null,
-    idTrabalhosProfessores int not null,
-    constraint fk_idTrabalhos foreign key (idTrabalhosProfessores)
-    REFERENCES tbTrabalhos(idTrabalhos) ON DELETE  CASCADE -- DELETA EM CASCATA
-);
-CREATE TABLE tbPontuacoes(
-    idPontuacoes int not null auto_increment primary key,
-    idAlunoPontuacoes int not null,
-    idPalestrasPontuacoes int not null,
-    pontos int default 0,
-    dataPontos timestamp default now(),
-    constraint fk_Idalunos foreign key (idAlunoPontuacoes)
-    references tbAlunos(idAlunos),
-    constraint fk_IdPalestras foreign key (idPalestrasPontuacoes)
-    references  tbPalestras(idPalestra)
-);
-create table tbQrCode(
-    idQr int auto_increment not null primary key,
-    tipoQr enum('ass','apr') comment 'ass: assistiu, apr: apresentou',
-    idQrTrabalho int not null,
-    idQrPalestra int not null,
-    qrCode BLOB not null,
-    constraint fk_idTrabalho foreign key (idQrTrabalho) references tbTrabalhos(idTrabalhos),
-    constraint fk_idPalestra foreign key (idQrPalestra) references tbPalestras(idPalestra)
-);
-create table tbFeedback(
-    idFeedback int not null primary key,
-    idAlunoFeedback int not null references tbAlunos(idAlunos),
-    idPalestraFeedback int not null references tbPalestras(idPalestra),
-    likeDislike enum('like', 'dislike')
-);
-create table tbGruposdeTrabalho(
-    idGrupos int not null auto_increment primary key,
-    nomeGrupo varchar(30) not null
-);
-create table tbAssociacaoAlunosGrupos(
-    idAssociacaoAlunosGrupo int not null auto_increment primary key,
-    idAlunoAssociacao int not null references tbAlunos(idAlunos),
-    idGrupoTrabalhoAssociacao int not null references tbGruposdeTrabalho(idGrupos)
-);
-CREATE TABLE tbVisitantes (
-    idVisitante INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nomeVisitante VARCHAR(60) NOT NULL,
-    emailVisitante VARCHAR(100) not null ,
-    telefoneVisitante VARCHAR(15),
-    idPalestraVisitada INT NOT NULL,
-    constraint fk_idPalestraVisitada FOREIGN KEY (idPalestraVisitada)
-        REFERENCES tbPalestras(idPalestra) ON DELETE CASCADE
+create table tbProfessores
+(
+    idProfessores int auto_increment
+        primary key,
+    nomeProfessor varchar(50) not null
 );
 
-select * from tbAlunos;
-create database db_wordpress;
-drop database db_wordpress;
-create database wordpress;
+create table tbGruposdeTrabalho
+(
+    idGrupos         int auto_increment
+        primary key,
+    nomeGrupo        varchar(30) not null,
+    idProfessorGrupo int         not null,
+    idAlunosGrupo    int         not null,
+    constraint fk_AlunosGrupo
+        foreign key (idAlunosGrupo) references tbAlunos (idAlunos),
+    constraint fk_tbProfessorGrupo
+        foreign key (idProfessorGrupo) references tbProfessores (idProfessores)
+);
 
-SHOW DATABASES;
+create table tbTrabalhos
+(
+    idTrabalhos    int auto_increment
+        primary key,
+    tituloTrabalho varchar(200) not null,
+    descricao      text         not null,
+    local          varchar(60)  not null,
+    horario        timestamp    not null,
+    idgrupo        int          not null,
+    constraint fk_grupo_trabalho
+        foreign key (idgrupo) references tbGruposdeTrabalho (idGrupos)
+);
 
+create table tbQrCode
+(
+    idQr         int auto_increment
+        primary key,
+    tipoQr       enum ('ass', 'apr') null comment 'ass: assistiu, apr: apresentou',
+    idQrTrabalho int                 not null,
+    qrCode       blob                not null,
+    constraint fk_idTrabalho
+        foreign key (idQrTrabalho) references tbTrabalhos (idTrabalhos)
+);
 
-DELIMITER //
+create table tbEscaneamentos
+(
+    idEscaneamento   int auto_increment
+        primary key,
+    idQrCode         int                                 not null,
+    idAluno          int                                 not null,
+    dataEscaneamento timestamp default CURRENT_TIMESTAMP null,
+    constraint tbEscaneamentos_ibfk_1
+        foreign key (idQrCode) references tbQrCode (idQr),
+    constraint tbEscaneamentos_ibfk_2
+        foreign key (idAluno) references tbAlunos (idAlunos)
+);
 
-CREATE PROCEDURE spAlunos(
-    IN spNome VARCHAR(255),
-    IN spturno ENUM('td', 'mn'),
-    IN spdianasc INT,
-    IN spmesnasc INT,
-    IN spanonasci INT
-)
+create index idAluno
+    on tbEscaneamentos (idAluno);
+
+create index idQrCode
+    on tbEscaneamentos (idQrCode);
+
+create definer = root@localhost trigger trgAtualizarPontuacao
+    after insert
+    on tbEscaneamentos
+    for each row
 BEGIN
-    DECLARE checkUser VARCHAR(255);
-    SELECT al.nomeAluno INTO checkUser
-    FROM tbAlunos al
-    WHERE al.nomeAluno LIKE CONCAT('%', spNome, '%')
-      AND al.turno = spturno;
+    DECLARE idTrabalho INT;
+    DECLARE pontosExistentes INT;
 
-    IF checkUser IS NULL THEN
-        INSERT INTO tbAlunos(nomeAluno, turno, diaNascimento, mesNascimento, anoNascimento)
-        VALUES (spNome, spturno, spdianasc, spmesnasc, spanonasci);
+    -- Obter o id do trabalho associado ao QR code escaneado
+    SELECT idQrTrabalho INTO idTrabalho
+    FROM tbQrCode
+    WHERE idQr = NEW.idQrCode;
 
-        SELECT "Aluno cadastrado" AS resultado;
+    -- Verificar se o aluno já tem uma pontuação registrada para este trabalho
+    SELECT pontos INTO pontosExistentes
+    FROM tbPontuacoes
+    WHERE idAluno = NEW.idAluno AND idTrabalhos = idTrabalho;
+
+    IF pontosExistentes IS NULL THEN
+        -- Se não houver pontuação, inserir nova pontuação
+        INSERT INTO tbPontuacoes(idAluno, idTrabalhos, pontos, idVisitante)
+        VALUES (NEW.idAluno, idTrabalho, 1, NULL); -- Adiciona 10 pontos por padrão, ajuste conforme necessário
     ELSE
-        SELECT "Não é possível cadastrar esse aluno, já existe" AS resultado;
+        -- Se houver pontuação, incrementar a pontuação existente
+        UPDATE tbPontuacoes
+        SET pontos = pontos + 1 -- Incrementa a pontuação (ajuste o valor conforme necessário)
+        WHERE idAluno = NEW.idAluno AND idTrabalhos = idTrabalho;
     END IF;
+END;
 
-END //
+create table tbVisitantes
+(
+    idVisitante          int auto_increment
+        primary key,
+    nomeVisitante        varchar(60)  not null,
+    emailVisitante       varchar(100) not null,
+    telefoneVisitante    varchar(15)  null,
+    idTrabalhosVisitados int          not null,
+    idQrCodeVisitados    int          not null,
+    constraint fk_visistante_qrcode
+        foreign key (idQrCodeVisitados) references tbQrCode (idQrTrabalho)
+);
 
-DELIMITER //
-create procedure spInserirAluno(in spNomeAluno varchar(60),in spTurma varchar(60),in spResponsavel varchar(60),in spNumero varchar(60))
+create table tbPontuacoes
+(
+    idPontuacao int auto_increment
+        primary key,
+    idAluno     int           not null,
+    idTrabalhos int           not null,
+    pontos      int default 0 not null,
+    idVisitante int           not null,
+    constraint fk_alunos_pontuacao
+        foreign key (idAluno) references tbAlunos (idAlunos),
+    constraint fk_trabalho_grupos
+        foreign key (idTrabalhos) references tbTrabalhos (idTrabalhos),
+    constraint fk_visitante_pontuacao
+        foreign key (idVisitante) references tbVisitantes (idVisitante)
+);
+
+create index fk_visistante_pontuacao
+    on tbVisitantes (idTrabalhosVisitados);
+
+create definer = root@localhost view buscarAluno as
+select `dbAmostra`.`tbAlunos`.`idAlunos`          AS `idAlunos`,
+       `dbAmostra`.`tbAlunos`.`nomeAluno`         AS `nomeAluno`,
+       `dbAmostra`.`tbAlunos`.`Responsavel`       AS `Responsavel`,
+       `dbAmostra`.`tbAlunos`.`NumeroResponsavel` AS `NumeroResponsavel`,
+       `dbAmostra`.`tbAlunos`.`Turma`             AS `Turma`
+from `dbAmostra`.`tbAlunos`;
+
+-- comment on column buscarAluno.Responsavel not supported: responśavel financeiro cadastrado
+
+create definer = root@localhost view vwAlunosPontuacoes as
+select `a`.`nomeAluno` AS `nomeAluno`, `t`.`tituloTrabalho` AS `tituloTrabalho`, `p`.`pontos` AS `pontos`
+from ((`dbAmostra`.`tbAlunos` `a` join `dbAmostra`.`tbPontuacoes` `p`
+       on ((`a`.`idAlunos` = `p`.`idAluno`))) join `dbAmostra`.`tbTrabalhos` `t`
+      on ((`p`.`idTrabalhos` = `t`.`idTrabalhos`)));
+
+create definer = root@localhost view vwPontos as
+select `pt`.`pontos` AS `pontos`, `tr`.`tituloTrabalho` AS `tituloTrabalho`
+from (`dbAmostra`.`tbPontuacoes` `pt` join `dbAmostra`.`tbTrabalhos` `tr`
+      on ((`pt`.`idTrabalhos` = `tr`.`idTrabalhos`)));
+
+create definer = root@localhost view vwPontosGrupos as
+select `tT`.`tituloTrabalho` AS `tituloTrabalho`,
+       `tg`.`nomeGrupo`      AS `nomeGrupo`,
+       `pr`.`nomeProfessor`  AS `nomeProfessor`,
+       `ta`.`nomeAluno`      AS `nomeAluno`,
+       `tp`.`pontos`         AS `pontos`
+from ((((`dbAmostra`.`tbGruposdeTrabalho` `tg` join `dbAmostra`.`tbProfessores` `pr`
+         on ((`tg`.`idProfessorGrupo` = `pr`.`idProfessores`))) join `dbAmostra`.`tbAlunos` `ta`
+        on ((`tg`.`idAlunosGrupo` = `ta`.`idAlunos`))) join `dbAmostra`.`tbTrabalhos` `tT`
+       on ((`tg`.`idAlunosGrupo` = `tT`.`idgrupo`))) join `dbAmostra`.`tbPontuacoes` `tp`
+      on ((`tp`.`idTrabalhos` = `tT`.`idTrabalhos`)));
+
+create definer = root@localhost view vwProfessoresGrupos as
+select `p`.`nomeProfessor` AS `nomeProfessor`, `g`.`nomeGrupo` AS `nomeGrupo`
+from (`dbAmostra`.`tbProfessores` `p` join `dbAmostra`.`tbGruposdeTrabalho` `g`
+      on ((`p`.`idProfessores` = `g`.`idProfessorGrupo`)));
+
+create definer = root@localhost view vwQrTrabalhos as
+select `qr`.`qrCode` AS `qrCode`, `tT`.`tituloTrabalho` AS `tituloTrabalho`, `tT`.`descricao` AS `descricao`
+from (`dbAmostra`.`tbQrCode` `qr` join `dbAmostra`.`tbTrabalhos` `tT` on ((`qr`.`idQrTrabalho` = `tT`.`idTrabalhos`)));
+
+create
+    definer = root@localhost procedure spAtualizarAluno(IN spIdAluno int, IN spNomeAluno varchar(60),
+                                                        IN spTurma varchar(60), IN spResponsavel varchar(60),
+                                                        IN spNumero varchar(60))
+BEGIN
+    UPDATE tbAlunos
+    SET nomeAluno = spNomeAluno, Turma = spTurma, Responsavel = spResponsavel, NumeroResponsavel = spNumero
+    WHERE idAlunos = spIdAluno;
+END;
+
+create
+    definer = root@localhost procedure spDeletarAluno(IN spIdAluno int)
+BEGIN
+    DELETE FROM tbAlunos WHERE idAlunos = spIdAluno;
+END;
+
+create
+    definer = root@localhost procedure spDeletarQrCode(IN spIdQr int)
+BEGIN
+    DELETE FROM tbQrCode WHERE idQr = spIdQr;
+END;
+
+create
+    definer = root@localhost procedure spInserirAluno(IN spNomeAluno varchar(60), IN spTurma varchar(60),
+                                                      IN spResponsavel varchar(60), IN spNumero varchar(60))
 BEGIN
     DECLARE chkUser varchar(60);
     SELECT al.nomeAluno into  chkUser from tbAlunos al where nomeAluno like  concat('%',spNomeAluno,'%');
@@ -128,5 +209,34 @@ BEGIN
     ELSE
         SELECT "USUARIO JA EXISTE" AS RESULTADO;
     end if ;
-end //
-DELIMITER ;
+end;
+
+create
+    definer = root@localhost procedure spInserirProfessor(IN spNomeProfessor varchar(50))
+BEGIN
+    INSERT INTO tbProfessores(nomeProfessor) VALUES (spNomeProfessor);
+END;
+
+create
+    definer = root@localhost procedure spInserirVisitante(IN spNomeVisitante varchar(60),
+                                                          IN spEmailVisitante varchar(100),
+                                                          IN spTelefoneVisitante varchar(15),
+                                                          IN spIdTrabalhoVisitado int, IN spIdQrVisitado int)
+BEGIN
+    INSERT INTO tbVisitantes(nomeVisitante, emailVisitante, telefoneVisitante, idTrabalhosVisitados, idQrCodeVisitados)
+    VALUES (spNomeVisitante, spEmailVisitante, spTelefoneVisitante, spIdTrabalhoVisitado, spIdQrVisitado);
+END;
+
+create
+    definer = root@localhost procedure spQr(IN spQrCode blob, IN spQrIdTrabalho int, IN spTipoQr enum ('ass', 'apr'))
+BEGIN
+    DECLARE checkIdtrabalho int;
+    SELECT qR.idQrTrabalho into checkIdtrabalho FROM tbQrCode qR inner join tbTrabalhos tT on qR.idQrTrabalho = tT.idTrabalhos where qR.idQrTrabalho = spQrIdTrabalho;
+    IF checkIdtrabalho > 0 THEN
+        SELECT 'Não pode Criar QR' AS RESULTADO;
+    ELSE
+         INSERT INTO tbQrCode(tipoQr, idQrTrabalho, qrCode) VALUES (spTipoQr,spQrIdTrabalho, spQrCode);
+         SELECT 'QR adicionado' AS RESULTADO;
+    end if;
+end;
+
