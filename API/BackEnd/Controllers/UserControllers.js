@@ -9,6 +9,7 @@ try{
         } catch (error) {
             rconsole.error(error)
         } finally {
+            db.end()
             console.info('Database -->', db.state);
         }
     };
@@ -19,6 +20,7 @@ try{
         } catch (error) {
             console.error('Erro ao adicionar aluno:', error);
         } finally {
+            db.end()
             console.info('Database -->', db.state);
         }
     };
@@ -29,6 +31,7 @@ try{
         } catch (error) {
             console.error('Erro ao atualizar aluno:', error);
         } finally {
+            db.end()
             console.info('Database -->', db.state);
         }
     };
@@ -39,6 +42,7 @@ try{
         } catch (error) {
             console.error('Erro ao deletar aluno:', error);
         } finally {
+            db.end()
             console.info('Database -->', db.state);
         }
     };
