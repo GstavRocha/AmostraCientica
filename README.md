@@ -78,7 +78,7 @@ f3[Trabalhos.js]
 a--->|"Controladores, lidam com as requisiçõe HTTP"|b
 a--->|"Modelos, lidam com a lógica de dados"|c
 a--->|"Vistas, lidam com a renderização de respostas(ou Jason ou APIs)"|d
-a--->|"Classes, reutilizavies, encapsulamento, helpers e classes"|e
+a--->|"Classes reutilizáveis, por exemplo, classes para conexão com BD, helpers"|e
 a--->|"Rotas, define as routas da aplicação"|f
 a--->|"Arquivos estáticos(css, imagens...)"|g
 a--->|"Dependências da Aplicação"|h
