@@ -30,7 +30,7 @@ function onDetect(detectedCodes) {
     result.value = code
     console.log("Código detectado:", code)
     alert("OK: " + code)
-    emit('qrConfirmed', code);;
+    emit('qrConfirmed', code);
   }
 }
 

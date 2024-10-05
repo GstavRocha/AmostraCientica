@@ -240,3 +240,138 @@ BEGIN
     end if;
 end;
 
+INSERT INTO tbAlunos( nomeAluno, Responsavel, NumeroResponsavel, Turma) VALUES ('gustavo','lucky','2323','6');
+
+use dbAmostra;
+drop procedure spInserirAluno;
+drop procedure spAtualizarAluno;
+alter table tbAlunos add column senha varchar(60) not null , add column login varchar(30), add column createAt timestamp default current_timestamp on update current_timestamp;
+alter table tbAlunos drop column senha, drop column login;
+select * from tbAlunos;
+
+alter table tbAlunos add column idGrupoAlunos int;
+ALTER TABLE tbAlunos
+    ADD CONSTRAINT fk_idgrupoaluno
+        FOREIGN KEY (idGrupoAlunos)
+ALTER TABLE tbGruposdeTrabalho add column idTrabalhoGrupo int;
+ALTER TABLE tbGruposdeTrabalho add constraint fk_trabalhoGrupo FOREIGN KEY (idTrabalhoGrupo) REFERENCES tbTrabalhos(idTrabalhos);
+ALTER TABLE tbGruposdeTrabalho add constraint fk_trabalhoGrupo FOREIGN KEY (idTrabalhoGrupo) REFERENCES tbTrabalhos(idTrabalhos);
+ALTER TABLE tbGruposdeTrabalho modify column idTrabalhoGrupo int unique;
+CREATE TABLE tbResponsavel(
+                              idResponsavel int primary key auto_increment not null,
+                              nomeResponsavel varchar(10) not null,
+                              tipoResponsavel ENUM('resp','visit') COMMENT 'resp - responsavel, visita - visitante'
+);
+ALTER TABLE tbAlunos DROP COLUMN NumeroResponsavel;
+alter table tbAlunos add column idResponsavelAlunos int, add constraint fk_idAlunoResponsavel foreign key (idResponsavelAlunos) REFERENCES tbResponsavel(idResponsavel);
+SELECT * FROM tbQrCode;
+ALTER TABLE tbQrCode modify column idQrTrabalho int unique;
+ALTER TABLE tbQrCode add constraint fk_idTrabalhoQr FOREIGN KEY (idQrTrabalho) REFERENCES tbTrabalhos(idTrabalhos);
+ALTER TABLE tbEscaneamentos add constraint fk_tbEscaneamento FOREIGN KEY (idQrCode) REFERENCES  tbQrCode(idQr);
+alter table tbProfessores add constraint fk_tbprofessoreTurma FOREIGN KEY (idTurma) REFERENCES tbAlunos(idAlunos);
+ALTER TABLE tbProfessores add constraint fk_tbprofessorTbGrupoTrabalho foreign key (idGrupoTrabalho) REFERENCES tbGruposdeTrabalho(idGrupos);
+
+ALTER TABLE tbProfessores add column idTurma int not null;
+ALTER TABLE tbProfessores add column idGrupoTrabalho int not null;
+ALTER TABLE tbGruposdeTrabalho add constraint fk_tbTrabalhosid FOREIGN KEY (idTrabalhoGrupo) REFERENCES tbTrabalhos(idTrabalhos);
+DROP table tbPontuacoes;
+
+CREATE TABLE tbPontos (
+                          idPonto INT PRIMARY KEY,
+                          idTrabalho INT,
+                          idAluno INT,
+                          nota DECIMAL(5,2),
+                          FOREIGN KEY (idTrabalho) REFERENCES tbTrabalhos(idTrabalhos),
+                          FOREIGN KEY (idAluno) REFERENCES tbAlunos(idAlunos),
+                          UNIQUE (idTrabalho, idAluno) -- Cada aluno e trabalho podem ter uma nota
+);
+
+
+
+
+select * from tbGruposdeTrabalho;
+ALTER TABLE  tbResponsavel ADD COLUMN idVisitante, ADD CONSTRAINT fk_tbVistanteResponsavel FOREIGN KEY (idVisitante) REFERENCES tbVisitantes(idVisitante);
+
+DROP view buscarAluno;
+ALTER TABLE tbResponsavel ADD COLUMN idVisitante, ADD CONSTRAINT fk_tbVistanteResponsavel FOREIGN KEY (idVisitante) REFERENCES tbVisitantes(idVisitante);
+CREATE TABLE tbTurma(
+                        idTurma int primary key auto_increment not null,
+                        nomeTurma varchar(15) not null,
+                        turno enum('nm', 'tr'),
+                        segMento enum('f1','f2','md')
+);
+
+
+ALTER TABLE tbAlunos ADD CONSTRAINT fk_alunosTurmas FOREIGN KEY (idTurmaAlunos) REFERENCES tbTurma(idTurma);
+
+SELECT * FROM tbAlunos;
+SELECT * FROM tbResponsavel;
+SELECT * FROM tbGruposdeTrabalho;
+CREATE TABLE tbTurma(
+  idTurma int not null AUTO_INCREMENT PRIMARY KEY,
+    nomeTurma tinyint not null,
+    segmentoTurma enum('f2','f1','me') not null ,
+    tipoTurma character  not null,
+    turno enum('man', 'ves')
+);
+SELECT * FROM tbAlunos;
+SELECT * FROM tbTurma;
+SELECT * FROM tbGruposdeTrabalho;
+ALTER TABLE tbGruposdeTrabalho ADD COLUMN idTurmaGrupo int;
+ALTER TABLE tbGruposdeTrabalho ADD CONSTRAINT fk_GrupoTurma FOREIGN KEY (idTurmaGrupo) REFERENCES tbTurma(idTurma);
+
+SELECT tA.nomeAluno, tT.nomeTurma, tGT.nomeGrupo,SUM(tP.nota) as "Pontos Total"  FROM tbAlunos tA
+    INNER JOIN tbResponsavel tR on tA.idResponsavelAlunos = tR.idResponsavel
+    INNER JOIN tbTurma tT on tA.idAlunos = tT.idTurma
+    INNER JOIN tbGruposdeTrabalho tGT on tA.idAlunos = tGT.idAlunosGrupo
+    INNER JOIN tbPontos tP on tA.idAlunos = tP.idAluno
+    GROUP BY tA.nomeAluno, tT.nomeTurma, tGT.nomeGrupo;
+;
+CREATE VIEW vwAlunosGruposPontos as
+SELECT tA.nomeAluno, tT.nomeTurma, tGT.nomeGrupo,SUM(tP.nota) as "Pontos Total"  FROM tbAlunos tA
+                                                                                          INNER JOIN tbResponsavel tR on tA.idResponsavelAlunos = tR.idResponsavel
+                                                                                          INNER JOIN tbTurma tT on tA.idAlunos = tT.idTurma
+                                                                                          INNER JOIN tbGruposdeTrabalho tGT on tA.idAlunos = tGT.idAlunosGrupo
+                                                                                          INNER JOIN tbPontos tP on tA.idAlunos = tP.idAluno
+GROUP BY tA.nomeAluno, tT.nomeTurma, tGT.nomeGrupo;
+;
+SELECT * FROM tbProfessores;
+SELECT * FROM tbAlunos;
+SELECT * FROM tbGruposdeTrabalho;
+# para adcionar um trabalho preciso:
+#
+INSERT INTO tbTrabalhos(tituloTrabalho, descricao, local, horario) VALUES ()
+
+INSERT INTO tbTrabalhos(tituloTrabalho, descricao, local, horario) VALUES
+                                                                       ('Economia Circular: Reduzindo Desperdício', 'Discussão sobre como implementar práticas de economia circular em empresas, diminuindo o uso de recursos e o desperdício.', 'Auditório A', '2024-10-04 09:00:00'),
+                                                                       ('Energias Renováveis: O Futuro Sustentável', 'Exploração das tecnologias emergentes em energia solar, eólica e outras fontes renováveis.', 'Sala Verde', '2024-10-04 11:00:00'),
+                                                                       ('Agricultura Sustentável e Orgânica', 'Abordagem sobre práticas agrícolas que minimizam o impacto ambiental e promovem alimentos orgânicos.', 'Sala Azul', '2024-10-04 13:00:00'),
+                                                                       ('Mobilidade Urbana Sustentável', 'Como cidades podem adotar transportes mais eficientes e menos poluentes.', 'Auditório B', '2024-10-05 09:00:00'),
+                                                                       ('Desafios e Oportunidades da Reciclagem', 'Debate sobre a importância da reciclagem e inovações na reutilização de materiais.', 'Sala Verde', '2024-10-05 11:00:00'),
+                                                                       ('Educação Ambiental: Formando Cidadãos Conscientes', 'Iniciativas de educação ambiental para promover uma sociedade mais consciente dos impactos ecológicos.', 'Sala Amarela', '2024-10-05 14:00:00'),
+                                                                       ('Construção Sustentável: Edificações Verdes', 'Apresentação sobre o uso de tecnologias sustentáveis em construções para reduzir a pegada ecológica.', 'Sala Azul', '2024-10-06 10:00:00'),
+                                                                       ('Preservação de Recursos Hídricos', 'Discussão sobre a importância de proteger fontes de água e como reduzir o consumo de água nas cidades.', 'Auditório C', '2024-10-06 12:00:00'),
+                                                                       ('Impactos da Indústria no Meio Ambiente', 'Estudo sobre como a indústria pode minimizar suas emissões e poluentes para se alinhar com os objetivos sustentáveis.', 'Sala Verde', '2024-10-06 15:00:00'),
+                                                                       ('Empreendedorismo Sustentável', 'Como criar negócios que tenham impacto positivo no meio ambiente e sejam financeiramente viáveis.', 'Auditório A', '2024-10-07 09:00:00');
+
+SELECT * FROM tbTrabalhos;
+DELIMITER
+CREATE PROCEDURE spInsertTrabalho(in spTituloT varchar(60), in spDescrT TEXT, in spLocalt varchar(60), in spHorarioT timestamp)
+BEGIN
+    declare checkId int;
+    SELECT tT.idTrabalhos INTO checkId
+    FROM tbTrabalhos tT
+    WHERE tT.tituloTrabalho
+    LIKE CONCAT('%',spTituloT,'%') or tT.descricao LIKE CONCAT('%',spDescrT,'%');
+    IF checkId > 0 THEN
+        SELECT "ERRO ID ALREADY EXIST" as 'RESULT';
+    ELSE
+        INSERT INTO tbTrabalhos(tituloTrabalho, descricao, local, horario)
+            VALUES (spTituloT, spDescrT, spLocalt, spHorarioT);
+        SELECT "TRABAHOS ADICIONADOS" as "RESULT";
+    end if;
+end;
+DELIMITER ;
+
+
+call spInserTrabalho()
