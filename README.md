@@ -53,6 +53,7 @@ h[\Node_modules\]
 i[app.js]
 j[package.json]
 l[.env]
+m[\BD\]
 
 
 b1[UsersController.js]
@@ -71,9 +72,17 @@ e1[UsersClasses.js]
 e2[TurmasClasses.js]
 e3[TrabalhosClasses.js]
 
-f1[UsersRoutes.js]
-f2[TrumasRoutes.js]
-f3[Trabalhos.js]
+f1[/UsersRoutes/]
+f2[/TurmasRoutes/]
+f3[/TrabalhosRoutes/]
+
+m1[/UsuariosQueries/]
+m11[AlunosQueries.js]
+m12[ProfessoresQueries.js]
+m13[ResponsaveisQueries.js]
+m15[VisitantesQueries.js]
+m2[TurmasQueries.js]
+m3[TrabalhosQueries.js]
 
 a--->|"Controladores, lidam com as requisiçõe HTTP"|b
 a--->|"Modelos, lidam com a lógica de dados"|c
@@ -85,6 +94,7 @@ a--->|"Dependências da Aplicação"|h
 a--->|"Ponto de entrada da aplicação(Express.js)"|i
 a--->|"Define as depedêndias da aplicação"|j
 a--->|"Variáveis de Ambiente"|l
+a--->|"Lida com a conexão e as queries do banco de dados"|m
 
 b-->b1
 b-->b2
@@ -106,6 +116,10 @@ f-->f1
 f-->f2
 f-->f3
 
-
-
+m-->m1
+m1-->m11
+m1-->m12
+m1-->m13
+m-->m2
+m-->m3
 ```

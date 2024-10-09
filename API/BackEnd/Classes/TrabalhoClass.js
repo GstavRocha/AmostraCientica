@@ -1,5 +1,7 @@
-module.exports = class TrabalhoClass{
-    constructor(id, titulo, descricao, local){
+module.exports = class TrabalhoClass
+{
+    constructor(id, titulo, descricao, local)
+    {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
@@ -7,35 +9,46 @@ module.exports = class TrabalhoClass{
         this._horario = new Date().getTime();
 
     }
-    get Id(){
+    get Id()
+    {
         return this.id;
     }
-    set Id(id){
+    set Id(id)
+    {
         this.id = id;
     }
-    get Titulo(){
+    get Titulo()
+    {
         return this.titulo;
     }
-    set Titulo(titulo){
+    set Titulo(titulo)
+    {
         this.titulo = titulo;
     }
-    get Descricao(){
+    get Descricao()
+    {
         return this.descricao;
     }
-    set Descricao(descricao){
+    set Descricao(descricao)
+    {
         this.descricao = descricao;
     }
-    get Local(){
+    get Local()
+    {
         return this.local;
     }
-    set Local(local){
+    set Local(local)
+    {
         this.local = local;
     }
-    get Horario(){
+    get Horario()
+    {
         return new Date(this._horario).toLocaleDateString();
     }
-    set Horario(novoHorario){
-        if(novoHorario instanceof Date && !isNaN(novoHorario)){
+    set Horario(novoHorario)
+    {
+        if(novoHorario instanceof Date && !isNaN(novoHorario))
+        {
             this._horario = novoHorario.getTime();
         }
 
